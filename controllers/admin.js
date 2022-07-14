@@ -20,13 +20,19 @@ exports.getCart = (req, res, next) => {
       return cart
         .getProducts()
         .then(products => {
-          res.json(products)
+          res.status(200).json({
+            success:true,
+            products:products})
           });
         })
     .catch(err => console.log(err));
 };
 
 exports.postCart = (req, res, next) => {
+
+  if(!req.body.productId){
+    return res.status(400).json({success:false,message:'productid is missing'})
+  }
   const prodId = req.body.productId;
   console.log('id is '+prodId)
   let fetchedCart;
@@ -53,12 +59,16 @@ exports.postCart = (req, res, next) => {
     .then(product => {
       return fetchedCart.addProduct(product, {
         through: { quantity: newQuantity }
+       
       });
     })
     .then(() => {
-      res.json(fetchedCart);
+      console.log('cart is: '+fetchedCart);
+      res.status(200).json({success:true,message:'Successfully added to cart'})
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      res.status(500).json({success:false,message:'Unable to add to cart'})
+    });
 };
 
 
