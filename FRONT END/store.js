@@ -1,11 +1,11 @@
 window.addEventListener('DOMContentLoaded',()=>{
-    axios.get('http://localhost:5000/products').then(res=>{
-        // console.log(res);
+    axios.get(`http://localhost:5000/products/1`).then(res=>{
+         console.log(res);
         
         // console.log(data);
         if(res.request.status===200){
-        const data=res.data;
-        // console.log('response   '+data);
+        const data=res.data.products;
+        console.log('response   '+data);
         const parent=document.getElementById('product-content');
         data.forEach(product => {
             const productHtml=`
@@ -30,10 +30,52 @@ window.addEventListener('DOMContentLoaded',()=>{
     }).catch(err=>console.log(err));
 })
 
+const page=document.getElementById('pagination-button');
+page.addEventListener('click',(e)=>{
+    if(e.target.className=='pbutton'){
+        const pageno=e.target.innerText;
+        console.log('pageno:'+pageno);
+        axios.get(`http://localhost:5000/products/${pageno}`).then(res=>{
+            console.log(res);
+           
+           // console.log(data);
+           if(res.request.status===200){
+            const parent=document.getElementById('product-content');
+            parent.innerHTML='';
+           const data=res.data.products;
+           console.log('response   '+data);
+           
+           data.forEach(product => {
+               const productHtml=`
+                 <div id=${product.title}>
+                   <h3>${product.title}</h3>
+                       <div class="image-container">
+                           <img class="prod-images" src=${product.imageUrl} alt="">
+                       </div>
+                        <div class="prod-details">
+                           <span>$<span>${product.price}</span></span>
+                           <button onClick="addToCart(${product.id})" class="shop-item-button" type='button'>ADD TO CART</button>
+                       </div>
+   
+   
+                </div>
+                </div>
+           `
+           parent.innerHTML +=productHtml;
+           });
+           
+       }
+       }).catch(err=>console.log(err));
+
+    }
+})
+
+
 function addToCart(productId){
 
     axios.post('http://localhost:5000/cart',{productId:productId})
     .then(res=>{
+        // console.log(res);
         if(res.status==200){
             notifyUser(res.data.message);
         }else{
@@ -64,6 +106,7 @@ parentContainer.addEventListener('click',(e)=>{
         axios.get('http://localhost:5000/cart')
           .then(res=>{
           const data=res.data.products;
+          document.querySelector('.cart-number').innerText=res.data.products.length;
           console.log('cart data: '+res);
             showCart(data);
             document.querySelector('#cart').style = "display:block;"
@@ -99,14 +142,17 @@ parentContainer.addEventListener('click',(e)=>{
 })
 
 function showCart(data){
-    
+    if(    document.querySelector('#cart').style = "display:block;"){
+        document.querySelector('.cart-items').innerHTML = '';
+        document.querySelector('#total-value').innerText=0;
+    }
 const cart_items = document.querySelector('#cart .cart-items');
 data.forEach(product=>{
     const cart_item = document.createElement('div');
     cart_item.classList.add('cart-row');
     cart_item.setAttribute('id',`in-cart-${product.id}`);
     let total_cart_price = document.querySelector('#total-value').innerText;
-    total_cart_price = parseFloat(total_cart_price) + parseFloat(product.price)
+    total_cart_price = parseFloat(total_cart_price) + parseFloat(product.price*product.cartItem.quantity)
     total_cart_price = total_cart_price.toFixed(2)
     document.querySelector('#total-value').innerText = `${total_cart_price}`;
     cart_item.innerHTML = `
