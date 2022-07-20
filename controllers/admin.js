@@ -1,22 +1,24 @@
 const Cart = require('../models/cart');
+const Order = require('../models/orders');
 const Product = require('../models/product');
+const OrderItem=require('../models/order-items');
 const ItemsPerPage=2;
 
 exports.getIndex=(req,res,next)=>{
 const page=req.params.page;
-console.log('pageno:'+page);
+// console.log('pageno:'+page);
 let totalItems;
 Product.count()
        .then(numProducts=>{
         totalItems=numProducts;
-        console.log('total products'+totalItems);
+        // console.log('total products'+totalItems);
         return Product.findAll({
             offset:((page-1)*ItemsPerPage),
             limit:ItemsPerPage    
         })
        })
          .then(products=>{
-          console.log('products  '+products);
+          // console.log('products  '+products);
           res.json({products,
           totalProducts:totalItems,
           hasNextPage:ItemsPerPage*page<totalItems,
@@ -52,10 +54,11 @@ exports.getCart = (req, res, next) => {
   req.user
     .getCart()
     .then(cart => {
-      console.log('this is cart: '+cart);
+      // console.log('this is cart: '+JSON.stringify(cart));
       return cart
         .getProducts()
         .then(products => {
+          console.log('products:'+products);
           res.status(200).json({
             success:true,
             products:products})
@@ -65,7 +68,7 @@ exports.getCart = (req, res, next) => {
 };
 
 exports.postCart = (req, res, next) => {
-
+console.log('post received')
   if(!req.body.productId){
     return res.status(400).json({success:false,message:'productid is missing'})
   }
@@ -99,7 +102,7 @@ exports.postCart = (req, res, next) => {
       });
     })
     .then(() => {
-      console.log('cart is: '+fetchedCart);
+      // console.log('cart is: '+fetchedCart);
       res.status(200).json({success:true,message:'Successfully added to cart'})
     })
     .catch(err => {
@@ -108,4 +111,76 @@ exports.postCart = (req, res, next) => {
 };
 
 
+exports.getOrder=(req,res,next)=>{
+  req.user
+  .getOrders()
+  .then(orders=>{
+    // return orders.getProducts()
+    //  .then(product=>{
+    //   console.log('ordered product: '+product);
+    //   res.status(200).json({
+    //     success:true,
+    //     products:product})
+    //   });
+    
+    // console.log(orders);
+    res.json(orders);
+// orders.getProducts()
+// .then(products=>{
+//   console.log('ordered products'+products);
+// })
+  })
+  .catch(err=>console.log(err));
+};
 
+
+exports.postOrder=(req,res,next)=>{
+  console.log('post received');
+//   req.user.getCart().then(cart=>{
+//   console.log('cart :'+JSON.stringify(cart));
+//   cart.getProducts().then(product=>{
+//     console.log('products are: '+JSON.stringify(product));
+//   })
+// })
+req.user
+    .createOrder({totalPrice:req.body.total})
+    .then(order => {
+      let fetchedOrder=order;
+      console.log('order: '+JSON.stringify(fetchedOrder));
+      return fetchedOrder;
+    }).then(fetchedOrder=>{
+      req.user.getCart().then(cart=>{
+        cart.getProducts().then(products=>{
+          console.log('products are'+JSON.stringify(products));
+          products.forEach(product => {
+            fetchedOrder.addProduct(product,{
+              through:{orderedItem:product.title,imageUrl:product.imageUrl}
+            });
+            
+          });
+        })
+      })
+    })
+    .then(() => {
+      // console.log('cart is: '+fetchedCart);
+      res.status(200).json({success:true,message:'Successfully Ordered'})
+    })
+    .catch(err => {
+      res.status(500).json({success:false,message:'Unable to Order'})
+    });
+      }
+//         // .then(orders => {
+//         //   console.log('orders are : '+JSON.stringify(orders));
+//         //   // prodid=JSON.stringify(products.cartItem.productId);
+//         //    req.user.addOrder(
+//         //     // totalPrice:products[0].price,
+//         //     // orderedItems:products[0].title,
+//         //     // productId:products[0].id,
+//           // )
+//           res.status(200).json({
+//             success:true,
+//             })
+//           });
+//         })
+//     .catch(err => console.log(err));
+// }
