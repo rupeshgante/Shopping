@@ -1,3 +1,4 @@
+
 window.addEventListener('DOMContentLoaded',()=>{
     axios.get(`http://localhost:5000/products/1`).then(res=>{
          console.log(res);
@@ -107,7 +108,7 @@ parentContainer.addEventListener('click',(e)=>{
           .then(res=>{
           const data=res.data.products;
           document.querySelector('.cart-number').innerText=res.data.products.length;
-          console.log('cart data: '+res);
+        //   console.log('cart data: '+res);
             showCart(data);
             document.querySelector('#cart').style = "display:block;"
           })
@@ -123,10 +124,15 @@ parentContainer.addEventListener('click',(e)=>{
                                 alert('You have Nothing in Cart , Add some products to purchase !');
                                 return
                             }
-                            alert('Thanks for the purchase')
-                            document.querySelector('.cart-items').innerHTML = '';
-                            document.querySelector('#total-value').innerText=0;
-                        }
+                            const total=document.querySelector('#total-value').innerText;
+
+                            axios.post('http://localhost:5000/orders',{total:total})
+                            .then(res=>{
+                                console.log(JSON.stringify(res));
+                            })
+                            .catch(err=>console.log(err));
+                }
+                        
                     
                         if (e.target.innerText=='REMOVE'){
                             // let total_cart_price = document.querySelector('#total-value').innerText;
@@ -138,7 +144,12 @@ parentContainer.addEventListener('click',(e)=>{
                             e.target.parentNode.parentNode.remove()
                         }
           
-    
+    if(e.target.className='order-holder'){
+       axios.get('http://localhost:5000/orders')
+       .then(reds=>{
+        console.log('orders: '+JSON.stringify(reds));
+       }).catch(err=>console.log(err));
+    }
 })
 
 function showCart(data){
