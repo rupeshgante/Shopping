@@ -54,7 +54,7 @@ exports.getCart = (req, res, next) => {
   req.user
     .getCart()
     .then(cart => {
-      // console.log('this is cart: '+JSON.stringify(cart));
+      console.log('this is cart: '+JSON.stringify(cart));
       return cart
         .getProducts()
         .then(products => {
@@ -112,36 +112,34 @@ console.log('post received')
 
 
 exports.getOrder=(req,res,next)=>{
+  // var products=[];
+  let i=0;
   req.user
   .getOrders()
   .then(orders=>{
-    // return orders.getProducts()
-    //  .then(product=>{
-    //   console.log('ordered product: '+product);
-    //   res.status(200).json({
-    //     success:true,
-    //     products:product})
-    //   });
-    
-    // console.log(orders);
-    res.json(orders);
-// orders.getProducts()
-// .then(products=>{
-//   console.log('ordered products'+products);
-// })
+    const products=orders.map(order=>{
+      return new Promise((res,rej)=>{
+        order.getProducts()
+        .then(prod=>{
+         res(prod)
+      })
+      })
+    })
+
+Promise.all(products).then(orders=>{
+  res.status(200).json({
+    success:true,
+      products:orders})
+})
   })
+  
   .catch(err=>console.log(err));
 };
 
 
 exports.postOrder=(req,res,next)=>{
   console.log('post received');
-//   req.user.getCart().then(cart=>{
-//   console.log('cart :'+JSON.stringify(cart));
-//   cart.getProducts().then(product=>{
-//     console.log('products are: '+JSON.stringify(product));
-//   })
-// })
+
 req.user
     .createOrder({totalPrice:req.body.total})
     .then(order => {
@@ -183,4 +181,9 @@ req.user
 //           });
 //         })
 //     .catch(err => console.log(err));
+// }
+
+
+// exports.postDelete=(req,res,next){
+
 // }
