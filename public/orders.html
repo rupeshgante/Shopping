@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOUR ORDERS</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+    <header>
+        <ul class='header'>
+            <li><a href="./index.html">HOME</a></li>
+            <li><a href="./store.html">STORE</a></li>
+            <li><a href="./about.html">ABOUT</a></li>
+            <li><a href="#"> ORDERS</a></li>
+            <a href="#cart" class="cart-holder">cart<span class='cart-number'>0</span></a>
+
+
+        </ul>
+        <h1>The Concert</h1>
+    </header>
+
+    <section id="orders" class="container">
+        <h2>Your Orders</h2>
+        <div class="order-row order-header">
+            <span class='order-item order-column'>ITEM</span>
+            <span class='order-price order-column'>PRICE</span>
+            <span class='order-date order-column'>ORDER PLACED ON</span>
+        </div>
+          <div class='orders-items' id="orders-items">
+    
+        </div>
+    </section>
+    <footer>
+        <div class="footer-title">
+            The Concert
+        </div>
+        <div class="footer-icons">
+            <ul>
+                <li><a href="https://www.youtube.com">
+                    <img src="youtube.png" alt="">
+                </a></li>
+                <li><a href="https://spotify.com">
+                    <img src="spotify.png" alt="">
+                </a></li>
+                <li><a href="https://facebook.com">
+                    <img src="fb.png" alt="">
+                </a></li>
+            </ul>
+        </div>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"></script>
+    <script src="orders.js"></script>
+</body>
+</body>
+</html>

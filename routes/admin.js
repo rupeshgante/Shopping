@@ -14,4 +14,6 @@ router.post('/orders',adminController.postOrder);
 
 router.get('/orders',adminController.getOrder);
 
+router.post('/delete',adminController.postDelete);
+
 module.exports=router;

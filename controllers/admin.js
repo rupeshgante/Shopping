@@ -153,8 +153,11 @@ req.user
           products.forEach(product => {
             fetchedOrder.addProduct(product,{
               through:{orderedItem:product.title,imageUrl:product.imageUrl}
+
             });
-            
+          
+            //  product.cartItem.destroy();
+
           });
         })
       })
@@ -167,23 +170,25 @@ req.user
       res.status(500).json({success:false,message:'Unable to Order'})
     });
       }
-//         // .then(orders => {
-//         //   console.log('orders are : '+JSON.stringify(orders));
-//         //   // prodid=JSON.stringify(products.cartItem.productId);
-//         //    req.user.addOrder(
-//         //     // totalPrice:products[0].price,
-//         //     // orderedItems:products[0].title,
-//         //     // productId:products[0].id,
-//           // )
-//           res.status(200).json({
-//             success:true,
-//             })
-//           });
-//         })
-//     .catch(err => console.log(err));
-// }
 
 
-// exports.postDelete=(req,res,next){
 
-// }
+exports.postDelete=(req,res,next)=>{
+// console.log('postrescdfc');
+const prodId=req.body.id;
+// console.log('product id :'+prodId);
+req.user
+    .getCart()
+    .then(cart => {
+      return cart.getProducts({ where: { id: prodId } });
+    })
+    .then(products => {
+      const product = products[0];
+      return product.cartItem.destroy();
+    })
+    .then(result => {
+      res.status(200).json({success:true,message:'Successfully Removed item'})
+    })
+    .catch(err =>  res.status(500).json({success:false,message:'Unable to Remove'}))
+
+}

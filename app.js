@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
+const path = require('path');
+
 const cors=require('cors');
 const dotenv=require('dotenv');
 dotenv.config();
@@ -30,6 +32,11 @@ app.use((req, res, next) => {
 });
 
 app.use(adminRoutes);
+
+app.use((req,res,next)=>{
+  console.log('URL:'+req.url);
+  res.sendFile(path.join(__dirname,`public/${req.url}`));
+})
 
 Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
 User.hasMany(Product);
